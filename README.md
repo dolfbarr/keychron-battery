@@ -59,6 +59,28 @@ sudo make install
 go install github.com/dolfbarr/keychron-battery/cmd/keychron-battery@latest
 ```
 
+### NixOS
+
+Enter the development shell and install the binary and user service into your
+home directory. This target does not modify `/etc`, NixOS configuration files,
+or udev rules:
+
+```bash
+nix-shell
+make install-nix
+```
+
+The target places the binary in `~/.local/bin` and enables
+`keychron-battery.service` as a systemd user service. Add the following to
+`/etc/nixos/configuration.nix` for non-root HID access, then run
+`sudo nixos-rebuild switch`:
+
+```nix
+services.udev.extraRules = ''
+  KERNEL=="hidraw*", ATTRS{idVendor}=="3434", MODE="0666", TAG+="uaccess"
+'';
+```
+
 ### Udev Rules (Non-Root Access)
 
 To allow `keychron-battery` to communicate with `/dev/hidraw*` endpoints without root permissions:

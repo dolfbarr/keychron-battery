@@ -1,7 +1,7 @@
 PREFIX ?= /usr/local
 BINDIR ?= $(PREFIX)/bin
 
-.PHONY: all build install clean test
+.PHONY: all build install install-nix clean test
 
 all: build
 
@@ -15,6 +15,13 @@ install: build
 		install -m 644 50-keychron.rules /etc/udev/rules.d/50-keychron.rules; \
 		udevadm control --reload-rules && udevadm trigger; \
 	fi
+
+install-nix: build
+	install -d $(HOME)/.local/bin $(HOME)/.config/systemd/user
+	install -m 755 bin/keychron-battery $(HOME)/.local/bin/keychron-battery
+	install -m 644 keychron-battery.service $(HOME)/.config/systemd/user/keychron-battery.service
+	systemctl --user daemon-reload
+	systemctl --user enable --now keychron-battery.service
 
 clean:
 	rm -rf bin/
